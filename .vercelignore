@@ -1,0 +1,10 @@
+backend/
+scripts/
+data/
+*.db
+*.sqlite3
+finance_controller.db
+backend/requirements.txt
+backend/Dockerfile
+Dockerfile
+render.yaml

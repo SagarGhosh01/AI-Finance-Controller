@@ -1,9 +1,9 @@
 services:
   - type: web
     name: fincheck-ai-backend
-    env: python
-    buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "PYTHONPATH=backend:. uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: DATABASE_URL
         value: sqlite:///./finance_controller.db

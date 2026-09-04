@@ -11,7 +11,7 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'copilot'; text: string; source?: string }>>([
     {
       sender: 'copilot',
-      text: `Hello! I am your AI Financial Controller Copilot for run ${runId.substring(0, 8)}. Ask me anything about reconciliation results, exception reasoning, or cash position projections.`
+      text: `Hello! 👋 I am your AI Financial Controller Copilot for run ${runId.substring(0, 8)}. Ask me anything about reconciliation results, exception reasoning, risk anomalies, or cash forecasts!`
     }
   ]);
   const [loading, setLoading] = useState(false);
@@ -52,6 +52,26 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
     }
   };
 
+  // Helper to render basic formatting (bold text & linebreaks)
+  const renderFormattedText = (text: string) => {
+    const lines = text.split('\n');
+    return lines.map((line, i) => {
+      // Process bold **text**
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      return (
+        <React.Fragment key={i}>
+          {parts.map((part, pIdx) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+              return <strong key={pIdx} className="font-bold text-white">{part.slice(2, -2)}</strong>;
+            }
+            return part;
+          })}
+          {i < lines.length - 1 && <br />}
+        </React.Fragment>
+      );
+    });
+  };
+
   return (
     <>
       {/* Floating Trigger Button */}
@@ -62,13 +82,13 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
         >
           <Bot className="w-5 h-5 text-white" />
           <span className="text-xs font-mono">Ask AI Copilot</span>
-          <Sparkles className="w-4 h-4 text-amber-300" />
+          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
         </button>
       )}
 
       {/* Copilot Drawer Panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[520px]">
+        <div className="fixed bottom-6 right-6 z-50 w-[420px] max-w-[calc(100vw-2rem)] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[540px]">
           {/* Header */}
           <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -77,7 +97,10 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white tracking-wide">AI FINANCE COPILOT</h4>
-                <span className="text-[10px] font-mono text-emerald-400">Online & Context-Aware</span>
+                <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  Online & Context-Aware
+                </span>
               </div>
             </div>
             <button
@@ -91,22 +114,28 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
           {/* Quick Query Chips */}
           <div className="px-3 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto text-[10px] font-mono">
             <button
-              onClick={() => handleSend('Why were items escalated to human review?')}
-              className="px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+              onClick={() => handleSend('Hi!')}
+              className="px-2.5 py-1 rounded-full bg-slate-800 text-blue-300 hover:bg-slate-700 whitespace-nowrap font-medium"
             >
-              Why Review Items?
+              👋 Greeting
             </button>
             <button
-              onClick={() => handleSend('Summarize cash position forecast')}
-              className="px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+              onClick={() => handleSend('Why are items in review?')}
+              className="px-2.5 py-1 rounded-full bg-slate-800 text-amber-300 hover:bg-slate-700 whitespace-nowrap font-medium"
             >
-              Cash Forecast
+              🔍 Exceptions
             </button>
             <button
-              onClick={() => handleSend('Verify conservation invariant')}
-              className="px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap"
+              onClick={() => handleSend('What is our cash position?')}
+              className="px-2.5 py-1 rounded-full bg-slate-800 text-emerald-300 hover:bg-slate-700 whitespace-nowrap font-medium"
             >
-              Invariant Check
+              💰 Cash Balance
+            </button>
+            <button
+              onClick={() => handleSend('Show fraud risk anomalies')}
+              className="px-2.5 py-1 rounded-full bg-slate-800 text-purple-300 hover:bg-slate-700 whitespace-nowrap font-medium"
+            >
+              🛡️ Risk Outliers
             </button>
           </div>
 
@@ -125,18 +154,18 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
                 <div
                   className={`p-3 rounded-xl max-w-[85%] ${
                     m.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-none'
+                      ? 'bg-blue-600 text-white rounded-br-none font-medium'
                       : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-bl-none font-mono text-[11px] leading-relaxed'
                   }`}
                 >
-                  {m.text}
+                  {renderFormattedText(m.text)}
                 </div>
               </div>
             ))}
             {loading && (
               <div className="flex gap-2 items-center text-slate-400 text-xs font-mono">
                 <Bot className="w-4 h-4 animate-bounce text-blue-400" />
-                <span>Copilot reasoning over ledger records...</span>
+                <span>Copilot reasoning over financial records...</span>
               </div>
             )}
           </div>
@@ -153,7 +182,7 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ runId }) => {
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Ask Copilot about records, exceptions..."
+              placeholder="Ask Copilot any financial question..."
               className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
             />
             <button

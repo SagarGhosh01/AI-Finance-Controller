@@ -75,9 +75,7 @@ export function App() {
         )}
       </main>
 
-      <footer className="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs font-mono text-slate-500">
-        Demo data & synthetic engine — not real financial records. Fincheck AI Autonomous Verification Layer v1.0.
-      </footer>
+
     </div>
   );
 }

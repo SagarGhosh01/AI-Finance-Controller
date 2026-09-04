@@ -22,6 +22,8 @@ Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
+from app.services.real_data_parser import RealDataParser
+
 @router.post("/runs", response_model=RunResponse)
 async def create_run(
     source_a_name: str = Form("Internal Ledger"),
@@ -40,25 +42,22 @@ async def create_run(
     records_b = []
 
     if use_synthetic or not file_a or not file_b:
-        # Generate synthetic data if not existing
+        # Generate synthetic benchmark data
         generate_synthetic_data(output_dir="data/synthetic", seed=42)
 
         with open("data/synthetic/internal_ledger.csv", "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            records_a = list(reader)
+            content_a = f.read()
+            records_a = RealDataParser.parse_csv(content_a, source_label="A")
 
         with open("data/synthetic/bank_feed.csv", "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            records_b = list(reader)
+            content_b = f.read()
+            records_b = RealDataParser.parse_csv(content_b, source_label="B")
     else:
-        content_a = (await file_a.read()).decode("utf-8")
-        content_b = (await file_b.read()).decode("utf-8")
+        content_a = (await file_a.read()).decode("utf-8", errors="ignore")
+        content_b = (await file_b.read()).decode("utf-8", errors="ignore")
 
-        reader_a = csv.DictReader(io.StringIO(content_a))
-        reader_b = csv.DictReader(io.StringIO(content_b))
-
-        records_a = list(reader_a)
-        records_b = list(reader_b)
+        records_a = RealDataParser.parse_csv(content_a, source_label="A")
+        records_b = RealDataParser.parse_csv(content_b, source_label="B")
 
     orchestrator = ReconciliationOrchestrator(db)
     run_obj = await orchestrator.run_pipeline(

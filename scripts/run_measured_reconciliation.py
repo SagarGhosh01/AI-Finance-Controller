@@ -17,19 +17,20 @@ from sqlalchemy.orm import sessionmaker
 from app.models.schema import Base, Run, Record, Match, ExceptionModel
 from app.services.reconciliation_orchestrator import ReconciliationOrchestrator
 from scripts.generate_synthetic_data import generate_synthetic_data
+from scripts.generate_huge_judge_dataset import generate_huge_judge_dataset
 
 async def main():
     print("==========================================================================")
     print("          AI FINANCE CONTROLLER — MEASURED RECONCILIATION RUN             ")
     print("==========================================================================")
 
-    # 1. Generate synthetic dataset with seed=42
-    generate_synthetic_data(output_dir="data/synthetic", seed=42)
+    # 1. Load huge 206-record judge dataset
+    generate_huge_judge_dataset(output_dir="data/judge_dataset", seed=100)
 
-    with open("data/synthetic/internal_ledger.csv", "r", encoding="utf-8") as f:
+    with open("data/judge_dataset/internal_ledger_judge.csv", "r", encoding="utf-8") as f:
         records_a = list(csv.DictReader(f))
 
-    with open("data/synthetic/bank_feed.csv", "r", encoding="utf-8") as f:
+    with open("data/judge_dataset/bank_feed_judge.csv", "r", encoding="utf-8") as f:
         records_b = list(csv.DictReader(f))
 
     total_input = len(records_a) + len(records_b)

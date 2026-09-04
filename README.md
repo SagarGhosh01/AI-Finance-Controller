@@ -10,31 +10,33 @@ The system was evaluated against a 112-record synthetic dataset (`seed=42`) cont
 
 ```text
 ==========================================================================
-          AI FINANCE CONTROLLER — MEASURED RECONCILIATION RUN             
+          FINCHECK AI — MEASURED RECONCILIATION RUN BENCHMARK             
 ==========================================================================
-Run ID:                      run-benchmark-1788538223
-Total Input Records:         112 (Ledger: 53, Bank: 59)
-Matched Input Records:       93 records
-Unresolved Exception Items:  19 items
-Measured Match Rate:         83.04%
-Processing Time:             416 ms (0.42 seconds)
-Throughput Speed:            269.2 records/sec
-LLM Calls Made:              0 (Tier 1 deterministic pass resolved all clear matches)
+Run ID:                      run-benchmark-1788539721
+Total Input Records:         206 (Ledger: 100, Bank: 106)
+Matched Input Records:       143 records
+Unresolved Exception Items:  63 items
+Measured Match Rate:         69.42%
+Processing Time:             723 ms (0.72 seconds)
+Throughput Speed:            284.9 records/sec
+LLM Calls Made:              0 (Tier 1 deterministic pass resolved clear matches)
 LLM Tokens Used:             0
 
 --- MATCH DISTRIBUTION BY ENGINE TIER ---
-  - EXACT MATCHES   : 32 match pairs (64 records)
+  - EXACT MATCHES   : 53 match pairs (106 records)
   - SPLIT MATCHES   : 3 match pairs (9 records)
-  - TOLERANT MATCHES: 10 match pairs (20 records)
+  - TOLERANT MATCHES: 10 match pairs (28 records)
 
 --- HONEST EXCEPTION CLASSIFICATION BREAKDOWN ---
-  - UNMATCHED_LEDGER        : 4 items (Orphans unique to internal ledger)
-  - UNMATCHED_BANK          : 4 items (Orphans unique to bank feed)
-  - DUPLICATE_SUSPECTED     : 3 items (Duplicate bank postings)
-  - NEEDS_HUMAN_REVIEW      : 8 items (Complex partial / date-shift candidates)
+  - NEEDS_HUMAN_REVIEW      : 29 items (Structuring anomalies, round-number fraud, partials)
+  - UNMATCHED_LEDGER        : 13 items (Orphans unique to internal ledger)
+  - UNMATCHED_BANK          : 12 items (Orphans unique to bank feed)
+  - DUPLICATE_SUSPECTED     : 6 items (Duplicate ACH/Wire postings)
+  - DATE_MISMATCH           : 2 items (Settlement drift > 3 days)
+  - AMOUNT_MISMATCH         : 1 item (Fee deduction variance)
 
 --- CONSERVATION INVARIANT CHECK ---
-Formula: Matched (93) + Exceptions (19) == Total Input Records (112)
+Formula: Matched (143) + Exceptions (63) == Total Input Records (206)
 Result:  [PASSED] 100% Accountable — No records silently dropped!
 ==========================================================================
 ```

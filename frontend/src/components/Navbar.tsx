@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, PlayCircle, BarChart3, Settings as SettingsIcon, DollarSign, History, Layers } from 'lucide-react';
+import { ShieldCheck, PlayCircle, BarChart3, Settings as SettingsIcon, DollarSign, History, Layers, TrendingUp } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -87,6 +87,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
                 >
                   <DollarSign className="w-4 h-4" />
                   <span>Cash Position</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'analytics'
+                      ? 'bg-slate-800 text-indigo-400 border border-slate-700'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Intelligence</span>
                 </button>
 
                 <button

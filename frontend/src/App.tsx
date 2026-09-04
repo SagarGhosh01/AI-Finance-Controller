@@ -8,6 +8,7 @@ import { ExceptionReview } from './pages/ExceptionReview';
 import { CashPositionPage } from './pages/CashPosition';
 import { AuditLogPage } from './pages/AuditLog';
 import { SettingsPage } from './pages/Settings';
+import { AdvancedAnalytics } from './pages/AdvancedAnalytics';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -64,6 +65,10 @@ export function App() {
 
         {activeTab === 'cash-position' && currentRunId && (
           <CashPositionPage runId={currentRunId} />
+        )}
+
+        {activeTab === 'analytics' && currentRunId && (
+          <AdvancedAnalytics runId={currentRunId} />
         )}
 
         {activeTab === 'audit' && currentRunId && (

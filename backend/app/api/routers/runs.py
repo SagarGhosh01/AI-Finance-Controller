@@ -291,6 +291,64 @@ def approve_close(run_id: str, db: Session = Depends(get_db)):
     db.refresh(run)
     return run
 
+from app.services.anomaly_engine import AnomalyDetectionEngine
+from app.services.liquidity_forecaster import LiquidityForecaster
+
+@router.get("/runs/{run_id}/anomalies")
+def get_run_anomalies(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    records = db.query(Record).filter(Record.run_id == run_id).all()
+    rec_dicts = [
+        {
+            "id": r.id,
+            "record_id": r.record_id,
+            "source": r.source,
+            "reference_id": r.reference_id,
+            "amount": r.amount,
+            "transaction_date": r.transaction_date,
+            "counterparty": r.counterparty,
+            "description": r.description,
+            "status": r.status
+        }
+        for r in records
+    ]
+
+    analyzed = AnomalyDetectionEngine.analyze_transactions(rec_dicts)
+    high_risk = [r for r in analyzed if r["risk_level"] == "HIGH"]
+    medium_risk = [r for r in analyzed if r["risk_level"] == "MEDIUM"]
+
+    return {
+        "run_id": run_id,
+        "total_records_analyzed": len(analyzed),
+        "high_risk_count": len(high_risk),
+        "medium_risk_count": len(medium_risk),
+        "records": analyzed
+    }
+
+@router.get("/runs/{run_id}/forecast")
+def get_run_forecast(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    matched_records = db.query(Record).filter(Record.run_id == run_id, Record.status == "matched").all()
+    rec_dicts = [{"amount": r.amount, "source": r.source} for r in matched_records]
+
+    net_position = sum(r.amount for r in matched_records if r.source == "A")
+    open_exceptions_cnt = db.query(ExceptionModel).filter(
+        ExceptionModel.run_id == run_id,
+        ExceptionModel.resolution_status == "open"
+    ).count()
+
+    forecast = LiquidityForecaster.generate_30day_forecast(
+        current_balance=net_position,
+        matched_records=rec_dicts,
+        open_exceptions_count=open_exceptions_cnt
+    )
+
 @router.post("/data/generate-synthetic")
 def generate_synthetic_endpoint(seed: int = Query(42)):
     generate_synthetic_data(output_dir="data/synthetic", seed=seed)

@@ -1,0 +1,54 @@
+record_id,reference_id,amount,currency,transaction_date,counterparty,description
+LED-TXN-1049,LED-ORPHAN-202,4554.26,USD,2026-08-03,Unmatched Ledger Vendor 2,Internal accrual record LED-ORPHAN-202
+LED-TXN-1012,PIN-009-113,-9154.72,USD,2026-08-06,Pinnacle Legal Services,Payment for invoice PIN-009-113
+LED-TXN-1003,APX-330-104,5697.73,USD,2026-08-09,Apex Supplies,Payment for invoice APX-330-104
+LED-TXN-1018,SRE-771-119,5082.6,USD,2026-08-08,Summit Real Estate,Payment for invoice SRE-771-119
+LED-TXN-1023,BHL-998-124,10966.78,USD,2026-08-09,BioHealth Labs,Payment for invoice BHL-998-124
+LED-TXN-1048,LED-ORPHAN-201,2576.95,USD,2026-08-08,Unmatched Ledger Vendor 1,Internal accrual record LED-ORPHAN-201
+LED-TXN-1044,INV-2026-00145,-12318.56,USD,2026-08-09,Acme Corp,Payment for invoice INV-2026-00145
+LED-TXN-1022,LOG-884-123,-3774.73,USD,2026-08-06,Global Logistics LLC,Payment for invoice LOG-884-123
+LED-TXN-1024,DF-302-125,3835.79,USD,2026-08-21,Delta Freight Co,Payment for invoice DF-302-125
+LED-TXN-1001,CS-991-102,9245.42,USD,2026-08-22,CloudScale Systems,Payment for invoice CS-991-102
+LED-TXN-1038,INV-2026-00139,8466.05,USD,2026-08-21,Acme Corp,Payment for invoice INV-2026-00139
+LED-TXN-1052,LED-ORPHAN-205,3837.52,USD,2026-08-20,Unmatched Ledger Vendor 5,Internal accrual record LED-ORPHAN-205
+LED-TXN-1027,APX-330-128,10993.42,USD,2026-08-03,Apex Supplies,Payment for invoice APX-330-128
+LED-TXN-1045,CS-SPLIT-801,3500.0,USD,2026-08-06,CloudScale Systems,Bulk invoice settlement CS-SPLIT-801
+LED-TXN-1010,DF-302-111,-10451.26,USD,2026-08-06,Delta Freight Co,Payment for invoice DF-302-111
+LED-TXN-1034,PIN-009-135,-3089.36,USD,2026-08-22,Pinnacle Legal Services,Payment for invoice PIN-009-135
+LED-TXN-1028,PIN-009-129,-9608.06,USD,2026-08-05,Pinnacle Legal Services,Payment for invoice PIN-009-129
+LED-TXN-1021,DF-302-122,-9050.91,USD,2026-08-22,Delta Freight Co,Payment for invoice DF-302-122
+LED-TXN-1030,HT-554-131,-12440.09,USD,2026-08-21,Horizon Telecom,Payment for invoice HT-554-131
+LED-TXN-1014,INV-2026-00115,-2978.74,USD,2026-08-02,Acme Corp,Payment for invoice INV-2026-00115
+LED-TXN-1005,VNG-112-106,1412.3,USD,2026-08-13,Vanguard Marketing,Payment for invoice VNG-112-106
+LED-TXN-1009,LOG-884-110,-10713.17,USD,2026-08-04,Global Logistics LLC,Payment for invoice LOG-884-110
+LED-TXN-1040,PIN-009-141,5690.38,USD,2026-08-14,Pinnacle Legal Services,Payment for invoice PIN-009-141
+LED-TXN-1007,LOG-884-108,12167.98,USD,2026-08-13,Global Logistics LLC,Payment for invoice LOG-884-108
+LED-TXN-1002,INV-2026-00103,1307.14,USD,2026-08-08,Acme Corp,Payment for invoice INV-2026-00103
+LED-TXN-1011,DF-302-112,3447.18,USD,2026-08-22,Delta Freight Co,Payment for invoice DF-302-112
+LED-TXN-1031,PIN-009-132,5725.85,USD,2026-08-08,Pinnacle Legal Services,Payment for invoice PIN-009-132
+LED-TXN-1039,BHL-998-140,4340.39,USD,2026-08-04,BioHealth Labs,Payment for invoice BHL-998-140
+LED-TXN-1041,APX-330-142,-10949.9,USD,2026-08-03,Apex Supplies,Payment for invoice APX-330-142
+LED-TXN-1032,INV-2026-00133,7415.61,USD,2026-08-08,Acme Corp,Payment for invoice INV-2026-00133
+LED-TXN-1017,CS-991-118,-3195.85,USD,2026-08-18,CloudScale Systems,Payment for invoice CS-991-118
+LED-TXN-1035,CS-991-136,-9083.4,USD,2026-08-19,CloudScale Systems,Payment for invoice CS-991-136
+LED-TXN-1006,VNG-112-107,7606.02,USD,2026-08-26,Vanguard Marketing,Payment for invoice VNG-112-107
+LED-TXN-1050,LED-ORPHAN-203,926.7,USD,2026-08-19,Unmatched Ledger Vendor 3,Internal accrual record LED-ORPHAN-203
+LED-TXN-1000,DF-302-101,-1524.94,USD,2026-08-24,Delta Freight Co,Payment for invoice DF-302-101
+LED-TXN-1004,BHL-998-105,5369.29,USD,2026-08-09,BioHealth Labs,Payment for invoice BHL-998-105
+LED-TXN-1043,HT-554-144,-6147.67,USD,2026-08-07,Horizon Telecom,Payment for invoice HT-554-144
+LED-TXN-1029,PIN-009-130,10924.55,USD,2026-08-14,Pinnacle Legal Services,Payment for invoice PIN-009-130
+LED-TXN-1019,INV-2026-00120,10784.62,USD,2026-08-05,Acme Corp,Payment for invoice INV-2026-00120
+LED-TXN-1008,SRE-771-109,2524.76,USD,2026-08-03,Summit Real Estate,Payment for invoice SRE-771-109
+LED-TXN-1025,CS-991-126,6811.33,USD,2026-08-25,CloudScale Systems,Payment for invoice CS-991-126
+LED-TXN-1046,APX-SPLIT-802,-4800.0,USD,2026-08-11,Apex Supplies,Bulk invoice settlement APX-SPLIT-802
+LED-TXN-1015,LOG-884-116,-2755.64,USD,2026-08-19,Global Logistics LLC,Payment for invoice LOG-884-116
+LED-TXN-1047,ACME-SPLIT-803,9200.0,USD,2026-08-15,Acme Corp,Bulk invoice settlement ACME-SPLIT-803
+LED-TXN-1051,LED-ORPHAN-204,900.16,USD,2026-08-12,Unmatched Ledger Vendor 4,Internal accrual record LED-ORPHAN-204
+LED-TXN-1013,DF-302-114,-8648.8,USD,2026-08-08,Delta Freight Co,Payment for invoice DF-302-114
+LED-TXN-1016,NEX-401-117,-5036.05,USD,2026-08-21,Nexus Tech Solutions,Payment for invoice NEX-401-117
+LED-TXN-1020,SRE-771-121,-934.57,USD,2026-08-13,Summit Real Estate,Payment for invoice SRE-771-121
+LED-TXN-1033,BHL-998-134,7944.12,USD,2026-08-08,BioHealth Labs,Payment for invoice BHL-998-134
+LED-TXN-1036,NEX-401-137,10122.59,USD,2026-08-07,Nexus Tech Solutions,Payment for invoice NEX-401-137
+LED-TXN-1037,HT-554-138,-4525.57,USD,2026-08-14,Horizon Telecom,Payment for invoice HT-554-138
+LED-TXN-1042,PIN-009-143,1359.17,USD,2026-08-21,Pinnacle Legal Services,Payment for invoice PIN-009-143
+LED-TXN-1026,INV-2026-00127,-1531.57,USD,2026-08-12,Acme Corp,Payment for invoice INV-2026-00127

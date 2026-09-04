@@ -64,7 +64,35 @@ Result:  [PASSED] 100% Accountable — No records silently dropped!
 
 ---
 
-## Quick Start & Installation
+## Deployment Guide: Vercel & Render
+
+### Step 1: Deploy Backend to Render
+
+1. Go to **[Render Dashboard](https://dashboard.render.com)** $\rightarrow$ Click **New +** $\rightarrow$ **Web Service**.
+2. Connect your GitHub repository: `https://github.com/SagarGhosh01/AI-Finance-Controller`.
+3. Render auto-detects `render.yaml` Blueprint. Set:
+   - **Environment**: `Python`
+   - **Build Command**: `pip install -r backend/requirements.txt`
+   - **Start Command**: `PYTHONPATH=backend:. uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Environment Variables:
+   - `ANTHROPIC_API_KEY` = *(Your key)*
+   - `DATABASE_URL` = `sqlite:///./finance_controller.db`
+5. Click **Create Web Service**. Your backend will be live at `https://fincheck-ai-backend.onrender.com`.
+
+---
+
+### Step 2: Deploy Frontend to Vercel
+
+1. Go to **[Vercel Dashboard](https://vercel.com/new)** $\rightarrow$ Click **Import Repository**.
+2. Select `SagarGhosh01/AI-Finance-Controller`.
+3. Configure Build Settings:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `frontend` (or root)
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Click **Deploy**. Vercel will build and host your app live at `https://ai-finance-controller.vercel.app`.
+
+---
 
 ### Option 1: Local Development
 

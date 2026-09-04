@@ -10,7 +10,13 @@ class Settings(BaseSettings):
     LLM_CONFIDENCE_THRESHOLD: float = 0.85
     LLM_MAX_CONCURRENCY: int = 5
     AUTH_ENABLED: bool = False
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "https://*.vercel.app",
+        "*"
+    ]
 
     model_config = ConfigDict(env_file=".env", extra="allow")
 

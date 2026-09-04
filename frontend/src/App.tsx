@@ -9,6 +9,7 @@ import { CashPositionPage } from './pages/CashPosition';
 import { AuditLogPage } from './pages/AuditLog';
 import { SettingsPage } from './pages/Settings';
 import { AdvancedAnalytics } from './pages/AdvancedAnalytics';
+import { AICopilotDrawer } from './components/AICopilotDrawer';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -80,7 +81,7 @@ export function App() {
         )}
       </main>
 
-
+      {currentRunId && <AICopilotDrawer runId={currentRunId} />}
     </div>
   );
 }

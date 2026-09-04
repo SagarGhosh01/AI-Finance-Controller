@@ -349,6 +349,119 @@ def get_run_forecast(run_id: str, db: Session = Depends(get_db)):
         open_exceptions_count=open_exceptions_cnt
     )
 
+from app.services.ai_copilot_service import AICopilotService
+from app.services.tax_classifier import TaxGLClassifier
+
+@router.post("/runs/{run_id}/copilot")
+async def ask_ai_copilot(run_id: str, query: str = Form(...), db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    run_dict = {
+        "id": run.id,
+        "total_records": run.total_records,
+        "matched_count": run.matched_count,
+        "exception_count": run.exception_count,
+        "match_rate_pct": run.match_rate_pct,
+        "status": run.status,
+        "approved_by": run.approved_by
+    }
+
+    records = db.query(Record).filter(Record.run_id == run_id).limit(15).all()
+    exceptions = db.query(ExceptionModel).filter(ExceptionModel.run_id == run_id).limit(15).all()
+
+    recs_summary = [{"code": r.record_id, "amount": r.amount, "status": r.status, "counterparty": r.counterparty} for r in records]
+    ex_summary = [{"code": e.record_code, "type": e.exception_type, "reason": e.reasoning} for e in exceptions]
+
+    res = await AICopilotService.ask_copilot(query, run_dict, recs_summary, ex_summary)
+    return res
+
+@router.post("/runs/{run_id}/auto-resolve")
+def ai_auto_resolve_exceptions(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    open_exceptions = db.query(ExceptionModel).filter(
+        ExceptionModel.run_id == run_id,
+        ExceptionModel.resolution_status == "open"
+    ).all()
+
+    resolved_count = 0
+    for ex in open_exceptions:
+        if ex.candidate_record_id and ex.exception_type in ["NEEDS_HUMAN_REVIEW", "DATE_MISMATCH"]:
+            rec = db.query(Record).filter(Record.id == ex.record_id).first()
+            cand_rec = db.query(Record).filter(Record.id == ex.candidate_record_id).first()
+
+            if rec and cand_rec and rec.status != "matched" and cand_rec.status != "matched":
+                rec.status = "matched"
+                cand_rec.status = "matched"
+                ex.resolution_status = "accept"
+                ex.resolved_by = "ai_auto_resolver"
+                ex.resolved_at = datetime.utcnow()
+
+                match_obj = Match(
+                    run_id=run_id,
+                    record_ids=[rec.id, cand_rec.id],
+                    record_codes=[rec.record_id, cand_rec.record_id],
+                    match_tier="ai_auto_resolved",
+                    confidence=0.90,
+                    reasoning="AI Auto-Resolver matched candidate under high-confidence proximity policy."
+                )
+                db.add(match_obj)
+                resolved_count += 1
+
+    # Recompute run statistics
+    all_recs = db.query(Record).filter(Record.run_id == run_id).all()
+    matched_cnt = len([r for r in all_recs if r.status == "matched"])
+    ex_cnt = len([r for r in all_recs if r.status == "exception"])
+    run.matched_count = matched_cnt
+    run.exception_count = ex_cnt
+    run.match_rate_pct = round((matched_cnt / run.total_records) * 100.0, 2) if run.total_records > 0 else 0.0
+
+    db.add(AuditLog(
+        run_id=run_id,
+        actor="agent",
+        action="AI_AUTO_RESOLVE_BATCH",
+        details={"resolved_count": resolved_count, "new_match_rate_pct": run.match_rate_pct}
+    ))
+    db.commit()
+    return {"status": "success", "resolved_count": resolved_count, "new_match_rate_pct": run.match_rate_pct}
+
+@router.get("/runs/{run_id}/tax-summary")
+def get_run_tax_summary(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    records = db.query(Record).filter(Record.run_id == run_id).all()
+
+    classified_records = []
+    gl_totals = {}
+
+    for r in records:
+        tax_info = TaxGLClassifier.classify(r.counterparty or "", r.description or "", r.amount)
+        item = {
+            "record_id": r.record_id,
+            "counterparty": r.counterparty,
+            "amount": r.amount,
+            "gl_account_code": tax_info["gl_account_code"],
+            "tax_category": tax_info["tax_category"],
+            "schedule_line": tax_info["schedule_line"]
+        }
+        classified_records.append(item)
+
+        gl_code = tax_info["gl_account_code"]
+        gl_totals[gl_code] = round(gl_totals.get(gl_code, 0.0) + r.amount, 2)
+
+    return {
+        "run_id": run_id,
+        "total_classified_records": len(classified_records),
+        "gl_account_totals": gl_totals,
+        "records": classified_records
+    }
+
 @router.post("/data/generate-synthetic")
 def generate_synthetic_endpoint(seed: int = Query(42)):
     generate_synthetic_data(output_dir="data/synthetic", seed=seed)

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getRunExceptions, resolveException } from '../api/client';
 import { ExceptionItem } from '../types';
-import { ShieldCheck, Filter, Check, X, Flag, HelpCircle, ChevronRight, CornerDownRight } from 'lucide-react';
+import { ShieldCheck, Filter, Check, X, Flag, HelpCircle, ChevronRight, CornerDownRight, Sparkles } from 'lucide-react';
 
 interface ExceptionReviewProps {
   runId: string;
@@ -47,8 +47,24 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
           </p>
         </div>
 
-        {/* Filters */}
+        {/* Filters & Actions */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch(`/api/runs/${runId}/auto-resolve`, { method: 'POST' }).then(r => r.json());
+                alert(`AI Auto-Resolver matched ${res.resolved_count} items! New Match Rate: ${res.new_match_rate_pct}%`);
+                fetchExceptions();
+              } catch (e: any) {
+                alert('Auto-resolve failed: ' + e.message);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-all"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>AI Auto-Resolve</span>
+          </button>
+
           <Filter className="w-4 h-4 text-slate-400" />
           <select
             value={filterType}

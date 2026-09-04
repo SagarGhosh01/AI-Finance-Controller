@@ -1,0 +1,13 @@
+record_id,reference_id,amount,currency,transaction_date,counterparty,description
+LED-1001,INV-2026-001,1500.00,USD,2026-08-01,Acme Corp,Monthly retainer invoice INV-2026-001
+LED-1002,LOG-884-102,2450.00,USD,2026-08-03,Global Logistics LLC,Freight shipment LOG-884-102
+LED-1003,CS-991-103,3200.00,USD,2026-08-05,CloudScale Systems,Cloud infrastructure hosting CS-991-103
+LED-1004,APX-330-104,850.50,USD,2026-08-08,Apex Supplies,Office stationery and equipment
+LED-1005,STR-772-105,9200.00,USD,2026-08-10,Stripe Billing,Merchant payout settlement
+LED-1006,VNG-112-106,4500.00,USD,2026-08-12,Vanguard Marketing,Ad campaign retainer
+LED-1007,HT-554-107,620.00,USD,2026-08-15,Horizon Telecom,Corporate VoIP and fiber line
+LED-1008,NEX-401-108,1800.00,USD,2026-08-18,Nexus Tech Solutions,IT consulting services
+LED-1009,PIN-009-109,5000.00,USD,2026-08-20,Pinnacle Legal Services,Legal retainer Form 1120
+LED-1010,SRE-771-110,12500.00,USD,2026-08-22,Summit Real Estate,HQ office lease payment
+LED-1011,CS-SPLIT-801,3500.00,USD,2026-08-24,CloudScale Systems,Bulk server expansion settlement
+LED-1012,LED-ORPHAN-201,4200.00,USD,2026-08-26,Unmatched Internal Vendor,Accrual posting for Q3

@@ -1,0 +1,11 @@
+record_id,reference_id,amount,currency,transaction_date,counterparty,description
+LED-2001,DF-302-201,3400.00,USD,2026-08-02,Delta Freight Co,Logistics cargo shipment DF-302-201
+LED-2002,BHL-998-202,1250.00,USD,2026-08-04,BioHealth Labs,Lab testing services BHL-998-202
+LED-2003,ACME-303,5400.00,USD,2026-08-07,Acme Corp,Software license renewal ACME-303
+LED-2004,GLOBAL-304,890.00,USD,2026-08-09,Global Logistics LLC,Express courier delivery
+LED-2005,CS-305,4100.00,USD,2026-08-11,CloudScale Systems,Database cluster expansion
+LED-2006,APX-306,670.00,USD,2026-08-14,Apex Supplies,Printer toner and stationery
+LED-2007,VNG-307,2900.00,USD,2026-08-16,Vanguard Marketing,SEO optimization services
+LED-2008,HT-308,1150.00,USD,2026-08-18,Horizon Telecom,Fiber optics upgrade
+LED-2009,NEX-309,7300.00,USD,2026-08-21,Nexus Tech Solutions,Cybersecurity audit retainer
+LED-2010,SRE-310,9500.00,USD,2026-08-23,Summit Real Estate,Regional office lease

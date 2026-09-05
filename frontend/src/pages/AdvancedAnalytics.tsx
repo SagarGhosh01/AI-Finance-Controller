@@ -156,7 +156,17 @@ export const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ runId }) =
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
               <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} />
               <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#0f172a',
+                  borderColor: '#334155',
+                  borderRadius: '8px',
+                  color: '#f8fafc',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)'
+                }}
+                itemStyle={{ color: '#38bdf8', fontWeight: '600' }}
+                labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
+              />
               <Legend />
               <Area type="monotone" dataKey="conservative_balance" name="Conservative Forecast" stroke="#10b981" fillOpacity={1} fill="url(#colorCons)" />
               <Area type="monotone" dataKey="optimistic_balance" name="Optimistic Forecast" stroke="#3b82f6" fillOpacity={1} fill="url(#colorOpt)" />

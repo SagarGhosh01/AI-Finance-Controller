@@ -51,7 +51,16 @@ export const RunResults: React.FC<RunResultsProps> = ({
     value,
   }));
 
-  const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899'];
+  const TIER_COLORS: Record<string, string> = {
+    EXACT: '#10b981',
+    TOLERANT: '#3b82f6',
+    SPLIT: '#8b5cf6',
+    LLM: '#f59e0b',
+    AI_AUTO_RESOLVED: '#06b6d4',
+    HUMAN_RESOLVED: '#ec4899',
+  };
+
+  const DEFAULT_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#06b6d4', '#ec4899'];
 
   return (
     <div className="space-y-6">
@@ -151,12 +160,23 @@ export const RunResults: React.FC<RunResultsProps> = ({
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {tierChartData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {tierChartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={TIER_COLORS[entry.name] || DEFAULT_COLORS[index % DEFAULT_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
+                    borderRadius: '8px',
+                    color: '#f8fafc',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)'
+                  }}
+                  itemStyle={{ color: '#38bdf8', fontWeight: '600' }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
                 />
                 <Legend />
               </PieChart>

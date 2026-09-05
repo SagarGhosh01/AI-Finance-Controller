@@ -499,14 +499,14 @@ def export_excel_report(run_id: str, db: Session = Depends(get_db)):
     ]
     anomalies = AnomalyDetectionEngine.analyze_transactions(rec_dicts)
 
-    csv_content = ExcelReportGenerator.generate_excel_csv_report(
+    xlsx_bytes = ExcelReportGenerator.generate_excel_workbook(
         run, matches, exceptions, records, tax_summary, anomalies
     )
 
     return StreamingResponse(
-        io.BytesIO(csv_content.encode("utf-8")),
-        media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=fincheck_ai_insights_report_{run_id}.csv"}
+        io.BytesIO(xlsx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename=fincheck_ai_executive_report_{run_id}.xlsx"}
     )
 
 @router.get("/runs/{run_id}/insights")

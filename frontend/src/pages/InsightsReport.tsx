@@ -41,7 +41,7 @@ export const InsightsReportView: React.FC<InsightsReportProps> = ({ runId }) => 
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer"
         >
           <Download className="w-4 h-4" />
-          <span>Download Excel Audit Report (.xlsx / .csv)</span>
+          <span>Download Executive Excel Report (.xlsx)</span>
         </a>
       </div>
 

@@ -139,41 +139,48 @@ def resolve_exception(
     ex.resolved_by = "human_analyst"
     ex.resolved_at = datetime.utcnow()
 
-    # If action is 'accept' (accepting candidate match)
+    cand_id = body.target_candidate_id or ex.candidate_record_id
     rec = db.query(Record).filter(Record.id == ex.record_id).first()
-    if body.action == "accept" and ex.candidate_record_id:
-        cand_rec = db.query(Record).filter(Record.id == ex.candidate_record_id).first()
+
+    # If action is 'accept' or 'manual' with a valid candidate
+    if body.action in ["accept", "manual"] and cand_id:
+        cand_rec = db.query(Record).filter(Record.id == cand_id).first()
         if rec and cand_rec and rec.status != "matched" and cand_rec.status != "matched":
             rec.status = "matched"
             cand_rec.status = "matched"
 
-            # Create human match object
+            # Create human resolved match object
             match_obj = Match(
                 run_id=ex.run_id,
                 record_ids=[rec.id, cand_rec.id],
                 record_codes=[rec.record_id, cand_rec.record_id],
                 match_tier="human_resolved",
                 confidence=1.0,
-                reasoning=f"Human resolved exception via Accept. Notes: {body.notes or 'None'}"
+                reasoning=f"Human resolved exception via {body.action.upper()}. Notes: {body.notes or 'None'}"
             )
             db.add(match_obj)
 
-            # Recompute run statistics
-            run = db.query(Run).filter(Run.id == ex.run_id).first()
-            if run:
-                all_recs = db.query(Record).filter(Record.run_id == run.id).all()
-                matched_cnt = len([r for r in all_recs if r.status == "matched"])
-                ex_cnt = len([r for r in all_recs if r.status == "exception"])
-                run.matched_count = matched_cnt
-                run.exception_count = ex_cnt
-                run.match_rate_pct = round((matched_cnt / run.total_records) * 100.0, 2) if run.total_records > 0 else 0.0
+    # Recompute run statistics
+    run = db.query(Run).filter(Run.id == ex.run_id).first()
+    if run:
+        all_recs = db.query(Record).filter(Record.run_id == run.id).all()
+        matched_cnt = len([r for r in all_recs if r.status == "matched"])
+        ex_cnt = len([r for r in all_recs if r.status == "exception"])
+        run.matched_count = matched_cnt
+        run.exception_count = ex_cnt
+        run.match_rate_pct = round((matched_cnt / run.total_records) * 100.0, 2) if run.total_records > 0 else 0.0
 
     db.add(AuditLog(
         run_id=ex.run_id,
         actor="human",
         action=f"EXCEPTION_RESOLVED_{body.action.upper()}",
         target_record_id=ex.record_id,
-        details={"exception_id": ex.id, "action": body.action, "notes": body.notes}
+        details={
+            "exception_id": ex.id,
+            "action": body.action,
+            "target_candidate_id": cand_id,
+            "notes": body.notes
+        }
     ))
     db.commit()
     db.refresh(ex)

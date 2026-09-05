@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getRunExceptions, resolveException } from '../api/client';
-import { ExceptionItem } from '../types';
-import { ShieldCheck, Filter, Check, X, Flag, HelpCircle, ChevronRight, CornerDownRight, Sparkles } from 'lucide-react';
+import { getRunExceptions, resolveException, getRunRecords } from '../api/client';
+import { ExceptionItem, RecordItem } from '../types';
+import { ShieldCheck, Filter, Check, X, Flag, HelpCircle, ChevronRight, CornerDownRight, Sparkles, Layers } from 'lucide-react';
 
 interface ExceptionReviewProps {
   runId: string;
@@ -9,10 +9,13 @@ interface ExceptionReviewProps {
 
 export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
   const [exceptions, setExceptions] = useState<ExceptionItem[]>([]);
+  const [opposingRecords, setOpposingRecords] = useState<RecordItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>('ALL');
   const [selectedEx, setSelectedEx] = useState<ExceptionItem | null>(null);
+  const [manualCandidateId, setManualCandidateId] = useState<string>('');
   const [notes, setNotes] = useState('');
+  const [actionSuccessMsg, setActionSuccessMsg] = useState<string>('');
 
   const fetchExceptions = () => {
     getRunExceptions(runId, filterType === 'ALL' ? undefined : filterType)
@@ -25,25 +28,54 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
     fetchExceptions();
   }, [runId, filterType]);
 
+  // Fetch opposing records for manual matching when an exception is selected
+  useEffect(() => {
+    if (selectedEx) {
+      const opposingSource = selectedEx.source === 'A' ? 'B' : 'A';
+      getRunRecords(runId, 'exception')
+        .then(recs => setOpposingRecords(recs.filter(r => r.source === opposingSource)))
+        .catch(console.error);
+    }
+  }, [runId, selectedEx]);
+
   const handleAction = async (action: 'accept' | 'reject' | 'manual' | 'flag') => {
     if (!selectedEx) return;
     try {
-      const updated = await resolveException(selectedEx.id, action, notes);
+      // Pass manualCandidateId if selected or fallback to existing candidate
+      const candIdToPass = manualCandidateId || selectedEx.candidate_record_id;
+
+      const res = await fetch(`/api/exceptions/${selectedEx.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          target_candidate_id: candIdToPass,
+          notes
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update exception');
+      const updated = await res.json();
+
       setSelectedEx(updated);
+      setActionSuccessMsg(`Exception ${selectedEx.record_code} successfully resolved via ${action.toUpperCase()}!`);
       fetchExceptions();
       setNotes('');
+      setManualCandidateId('');
+
+      setTimeout(() => setActionSuccessMsg(''), 4000);
     } catch (e: any) {
       alert('Action failed: ' + e.message);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Human-in-the-Loop Exception Workbench</h1>
           <p className="text-sm text-slate-400 mt-1">
-            Review agent-classified exceptions, inspect reasoning, and resolve edge cases.
+            Review agent-classified exceptions, inspect reasoning, select manual candidate matches, and resolve edge cases.
           </p>
         </div>
 
@@ -82,9 +114,16 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
         </div>
       </div>
 
+      {actionSuccessMsg && (
+        <div className="p-3 bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-mono flex items-center gap-2 animate-fade-in">
+          <Check className="w-4 h-4 text-emerald-400" />
+          <span>{actionSuccessMsg}</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Exceptions List */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <div className="lg:col-span-2 glass-card rounded-2xl overflow-hidden shadow-sm">
           <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
             <h2 className="font-semibold text-sm text-slate-200 uppercase tracking-wider">Unresolved Exception Items</h2>
             <span className="text-xs font-mono text-slate-400">{exceptions.length} items</span>
@@ -101,7 +140,10 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
               {exceptions.map(ex => (
                 <div
                   key={ex.id}
-                  onClick={() => setSelectedEx(ex)}
+                  onClick={() => {
+                    setSelectedEx(ex);
+                    setManualCandidateId(ex.candidate_record_id || '');
+                  }}
                   className={`p-4 hover:bg-slate-800/50 cursor-pointer transition-colors ${
                     selectedEx?.id === ex.id ? 'bg-slate-800/80 border-l-4 border-blue-500' : ''
                   }`}
@@ -114,7 +156,7 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
                       </span>
                     </div>
 
-                    <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-semibold ${
+                    <span className={`text-[10px] font-mono uppercase px-2.5 py-0.5 rounded font-bold ${
                       ex.resolution_status === 'open'
                         ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                         : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
@@ -141,7 +183,7 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
         </div>
 
         {/* Detail & Action Drawer */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-20">
+        <div className="glass-card rounded-2xl p-6 h-fit sticky top-20">
           <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-4 border-b border-slate-800 pb-3">
             Agent Reasoning & Human Actions
           </h3>
@@ -158,34 +200,53 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
                 <div className="text-xs font-bold text-amber-400">{selectedEx.exception_type}</div>
               </div>
 
-              {selectedEx.candidate_record_code && (
-                <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-lg space-y-1">
-                  <div className="text-[11px] font-mono text-slate-400">PROXIMITY CANDIDATE:</div>
-                  <div className="text-xs font-mono font-bold text-blue-400">{selectedEx.candidate_record_code}</div>
+              {/* Proximity or Manual Candidate Selector */}
+              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+                <div className="text-[11px] font-mono text-slate-400 flex items-center justify-between">
+                  <span>MATCH CANDIDATE:</span>
+                  <span className="text-[10px] text-blue-400">Opposing Feed ({selectedEx.source === 'A' ? 'Bank' : 'Ledger'})</span>
                 </div>
-              )}
+
+                <select
+                  value={manualCandidateId}
+                  onChange={e => setManualCandidateId(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">-- No Candidate (Orphan Record) --</option>
+                  {selectedEx.candidate_record_id && (
+                    <option value={selectedEx.candidate_record_id}>
+                      Proximity Candidate: {selectedEx.candidate_record_code}
+                    </option>
+                  )}
+                  {opposingRecords.map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.record_id} (${r.amount.toFixed(2)}) - {r.counterparty || r.transaction_date}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div className="space-y-1">
                 <div className="text-xs font-mono text-slate-400">AGENT REASONING:</div>
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300 font-mono leading-relaxed">
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 font-mono leading-relaxed">
                   {selectedEx.reasoning}
                 </div>
               </div>
 
               <div className="space-y-2 pt-2">
-                <label className="block text-xs font-mono text-slate-400">Resolution Notes</label>
+                <label className="block text-xs font-mono text-slate-400">Resolution Analyst Notes</label>
                 <textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
-                  placeholder="Optional analyst notes..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500 h-20"
+                  placeholder="Optional analyst notes for period close audit..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-white focus:outline-none focus:border-blue-500 h-20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <button
                   onClick={() => handleAction('accept')}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition-all"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Accept Match</span>
@@ -193,7 +254,7 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
 
                 <button
                   onClick={() => handleAction('reject')}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md transition-all"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Reject Match</span>
@@ -201,7 +262,7 @@ export const ExceptionReview: React.FC<ExceptionReviewProps> = ({ runId }) => {
 
                 <button
                   onClick={() => handleAction('flag')}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shadow-md transition-all col-span-2"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shadow-md transition-all col-span-2 cursor-pointer"
                 >
                   <Flag className="w-3.5 h-3.5" />
                   <span>Flag for Controller Review</span>

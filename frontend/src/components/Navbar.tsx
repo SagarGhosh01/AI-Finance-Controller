@@ -78,10 +78,22 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
                 </button>
 
                 <button
+                  onClick={() => setActiveTab('3way')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                    activeTab === '3way'
+                      ? 'bg-slate-800 text-blue-400 border border-slate-700 shadow-md'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Layers className="w-4 h-4" />
+                  <span>3-Way Match</span>
+                </button>
+
+                <button
                   onClick={() => setActiveTab('cash-position')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                     activeTab === 'cash-position'
-                      ? 'bg-slate-800 text-emerald-400 border border-slate-700'
+                      ? 'bg-slate-800 text-emerald-400 border border-slate-700 shadow-md'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                   }`}
                 >

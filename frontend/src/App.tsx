@@ -10,14 +10,24 @@ import { AuditLogPage } from './pages/AuditLog';
 import { SettingsPage } from './pages/Settings';
 import { AdvancedAnalytics } from './pages/AdvancedAnalytics';
 import { AICopilotDrawer } from './components/AICopilotDrawer';
+import { ThreeWayReconciliationView } from './pages/ThreeWayReconciliation';
+import { ToastContainer, ToastMessage } from './components/Toast';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [currentRunId, setCurrentRunId] = useState<string | null>(null);
 
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const addToast = (type: 'success' | 'warning' | 'info', title: string, message?: string) => {
+    const id = String(Date.now());
+    setToasts(prev => [...prev, { id, type, title, message }]);
+  };
+
   const handleRunCreated = (runId: string) => {
     setCurrentRunId(runId);
     setActiveTab('progress');
+    addToast('success', 'Autonomous Reconciliation Launched', `Run ID ${runId.substring(0, 8)} started successfully.`);
   };
 
   const handleSelectRun = (runId: string) => {
@@ -68,6 +78,10 @@ export function App() {
           <CashPositionPage runId={currentRunId} />
         )}
 
+        {activeTab === '3way' && currentRunId && (
+          <ThreeWayReconciliationView runId={currentRunId} />
+        )}
+
         {activeTab === 'analytics' && currentRunId && (
           <AdvancedAnalytics runId={currentRunId} />
         )}
@@ -80,6 +94,8 @@ export function App() {
           <SettingsPage />
         )}
       </main>
+
+      <ToastContainer toasts={toasts} onDismiss={id => setToasts(t => t.filter(x => x.id !== id))} />
 
       {currentRunId && <AICopilotDrawer runId={currentRunId} />}
     </div>

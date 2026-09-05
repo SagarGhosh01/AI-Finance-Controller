@@ -462,6 +462,72 @@ def get_run_tax_summary(run_id: str, db: Session = Depends(get_db)):
         "records": classified_records
     }
 
+from app.services.excel_report_generator import ExcelReportGenerator
+
+@router.get("/runs/{run_id}/excel-report")
+def export_excel_report(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    matches = db.query(Match).filter(Match.run_id == run_id).all()
+    exceptions = db.query(ExceptionModel).filter(ExceptionModel.run_id == run_id).all()
+    records = db.query(Record).filter(Record.run_id == run_id).all()
+
+    # Tax summary
+    classified_recs = []
+    gl_totals = {}
+    for r in records:
+        tax_info = TaxGLClassifier.classify(r.counterparty or "", r.description or "", r.amount)
+        gl_code = tax_info["gl_account_code"]
+        gl_totals[gl_code] = round(gl_totals.get(gl_code, 0.0) + r.amount, 2)
+
+    tax_summary = {"gl_account_totals": gl_totals}
+
+    # Anomalies
+    rec_dicts = [
+        {"id": r.id, "record_code": r.record_id, "amount": r.amount, "counterparty": r.counterparty}
+        for r in records
+    ]
+    anomalies = AnomalyDetectionEngine.analyze_transactions(rec_dicts)
+
+    csv_content = ExcelReportGenerator.generate_excel_csv_report(
+        run, matches, exceptions, records, tax_summary, anomalies
+    )
+
+    return StreamingResponse(
+        io.BytesIO(csv_content.encode("utf-8")),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=fincheck_ai_insights_report_{run_id}.csv"}
+    )
+
+@router.get("/runs/{run_id}/insights")
+def get_run_insights(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    # Calculate estimated manual hours saved (assuming ~3 minutes per transaction for manual checking)
+    manual_minutes_saved = run.total_records * 3
+    hours_saved = round(manual_minutes_saved / 60.0, 1)
+
+    exceptions = db.query(ExceptionModel).filter(ExceptionModel.run_id == run_id).all()
+    ex_causes = {}
+    for ex in exceptions:
+        ex_causes[ex.exception_type] = ex_causes.get(ex.exception_type, 0) + 1
+
+    return {
+        "run_id": run_id,
+        "total_records": run.total_records,
+        "matched_count": run.matched_count,
+        "exception_count": run.exception_count,
+        "match_rate_pct": run.match_rate_pct,
+        "hours_saved_estimate": hours_saved,
+        "processing_time_ms": run.processing_time_ms,
+        "exception_causes": ex_causes,
+        "conservation_invariant_verified": (run.matched_count + run.exception_count) == run.total_records
+    }
+
 @router.post("/data/generate-synthetic")
 def generate_synthetic_endpoint(seed: int = Query(42)):
     generate_synthetic_data(output_dir="data/synthetic", seed=seed)

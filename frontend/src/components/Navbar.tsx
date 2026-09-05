@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, PlayCircle, BarChart3, Settings as SettingsIcon, DollarSign, History, Layers, TrendingUp } from 'lucide-react';
+import { ShieldCheck, PlayCircle, BarChart3, Settings as SettingsIcon, DollarSign, History, Layers, TrendingUp, FileSpreadsheet } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -87,6 +87,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
                 >
                   <Layers className="w-4 h-4" />
                   <span>3-Way Match</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('insights')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                    activeTab === 'insights'
+                      ? 'bg-slate-800 text-emerald-400 border border-slate-700 shadow-md'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`}
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>Excel Report</span>
                 </button>
 
                 <button

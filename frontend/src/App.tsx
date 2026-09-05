@@ -12,6 +12,7 @@ import { AdvancedAnalytics } from './pages/AdvancedAnalytics';
 import { AICopilotDrawer } from './components/AICopilotDrawer';
 import { ThreeWayReconciliationView } from './pages/ThreeWayReconciliation';
 import { ToastContainer, ToastMessage } from './components/Toast';
+import { InsightsReportView } from './pages/InsightsReport';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -80,6 +81,10 @@ export function App() {
 
         {activeTab === '3way' && currentRunId && (
           <ThreeWayReconciliationView runId={currentRunId} />
+        )}
+
+        {activeTab === 'insights' && currentRunId && (
+          <InsightsReportView runId={currentRunId} />
         )}
 
         {activeTab === 'analytics' && currentRunId && (

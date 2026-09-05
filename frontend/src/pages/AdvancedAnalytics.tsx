@@ -11,23 +11,77 @@ export const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ runId }) =
   const [forecast, setForecast] = useState<any>(null);
   const [anomalies, setAnomalies] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadIntelligence = () => {
+    setLoading(true);
+    setError(null);
+
     Promise.all([
-      fetch(`/api/runs/${runId}/forecast`).then(r => r.json()),
-      fetch(`/api/runs/${runId}/anomalies`).then(r => r.json())
+      fetch(`/api/runs/${runId}/forecast`).then(async r => {
+        if (!r.ok) throw new Error(`Forecast API returned ${r.status}`);
+        const json = await r.json();
+        if (!json || json.detail || typeof json.projected_30d_balance !== 'number') {
+          throw new Error('Forecast data unavailable');
+        }
+        return json;
+      }),
+      fetch(`/api/runs/${runId}/anomalies`).then(async r => {
+        if (!r.ok) throw new Error(`Anomalies API returned ${r.status}`);
+        const json = await r.json();
+        if (!json || json.detail || !Array.isArray(json.records)) {
+          throw new Error('Anomaly data unavailable');
+        }
+        return json;
+      })
     ])
       .then(([fData, aData]) => {
         setForecast(fData);
         setAnomalies(aData);
       })
-      .catch(console.error)
+      .catch(err => {
+        console.error('Intelligence load error:', err);
+        setError(err.message || 'Failed to compute predictive models.');
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (runId) {
+      loadIntelligence();
+    }
   }, [runId]);
 
-  if (loading || !forecast || !anomalies) {
-    return <div className="p-8 text-center text-slate-400 font-mono">Running predictive financial intelligence models...</div>;
+  if (loading) {
+    return (
+      <div className="p-12 text-center text-slate-400 font-mono space-y-3">
+        <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm font-semibold text-slate-300">Running predictive financial intelligence & risk models...</p>
+        <p className="text-xs text-slate-500">Calculating 30-day forward liquidity curves & structuring anomaly flags.</p>
+      </div>
+    );
   }
+
+  if (error || !forecast || !anomalies) {
+    return (
+      <div className="p-8 bg-slate-900 border border-slate-800 rounded-xl text-center space-y-4 max-w-lg mx-auto my-12">
+        <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-white">Intelligence Data Unavailable</h3>
+        <p className="text-sm text-slate-400 font-mono">
+          {error || 'Unable to compute forecast or anomaly scores for the selected run.'}
+        </p>
+        <button
+          onClick={loadIntelligence}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-mono text-xs transition-colors"
+        >
+          Retry Calculation
+        </button>
+      </div>
+    );
+  }
+
 
   return (
     <div className="space-y-6">

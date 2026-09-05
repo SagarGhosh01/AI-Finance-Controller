@@ -355,6 +355,7 @@ def get_run_forecast(run_id: str, db: Session = Depends(get_db)):
         matched_records=rec_dicts,
         open_exceptions_count=open_exceptions_cnt
     )
+    return forecast
 
 from app.services.ai_copilot_service import AICopilotService
 from app.services.tax_classifier import TaxGLClassifier

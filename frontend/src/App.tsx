@@ -20,6 +20,18 @@ export function App() {
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
+  // Automatically load the latest run ID if none selected
+  React.useEffect(() => {
+    fetch('/api/runs')
+      .then(r => r.json())
+      .then(runs => {
+        if (Array.isArray(runs) && runs.length > 0 && !currentRunId) {
+          setCurrentRunId(runs[0].id);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   const addToast = (type: 'success' | 'warning' | 'info', title: string, message?: string) => {
     const id = String(Date.now());
     setToasts(prev => [...prev, { id, type, title, message }]);
@@ -35,6 +47,32 @@ export function App() {
     setCurrentRunId(runId);
     setActiveTab('run-results');
   };
+
+  const renderRunRequiredFallback = () => (
+    <div className="p-12 bg-slate-900 border border-slate-800 rounded-2xl text-center max-w-lg mx-auto my-12 space-y-4 shadow-xl">
+      <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto">
+        <span className="font-mono text-xl font-bold">!</span>
+      </div>
+      <h2 className="text-xl font-bold text-white">No Active Reconciliation Batch Selected</h2>
+      <p className="text-sm text-slate-400">
+        Please select an existing run batch from the Dashboard or launch a new run to view detailed intelligence, exceptions, or audit reports.
+      </p>
+      <div className="flex items-center justify-center gap-3 pt-2">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-mono text-xs transition-colors"
+        >
+          Go to Dashboard
+        </button>
+        <button
+          onClick={() => setActiveTab('new-run')}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-mono text-xs transition-colors"
+        >
+          Launch New Run
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -56,49 +94,50 @@ export function App() {
           <NewRun onRunCreated={handleRunCreated} />
         )}
 
-        {activeTab === 'progress' && currentRunId && (
+        {activeTab === 'progress' && (currentRunId ? (
           <RunProgress
             runId={currentRunId}
             onComplete={() => setActiveTab('run-results')}
           />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'run-results' && currentRunId && (
+        {activeTab === 'run-results' && (currentRunId ? (
           <RunResults
             runId={currentRunId}
             onNavigateToExceptions={() => setActiveTab('exceptions')}
             onNavigateToCashPosition={() => setActiveTab('cash-position')}
           />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'exceptions' && currentRunId && (
+        {activeTab === 'exceptions' && (currentRunId ? (
           <ExceptionReview runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'cash-position' && currentRunId && (
+        {activeTab === 'cash-position' && (currentRunId ? (
           <CashPositionPage runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === '3way' && currentRunId && (
+        {activeTab === '3way' && (currentRunId ? (
           <ThreeWayReconciliationView runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'insights' && currentRunId && (
+        {activeTab === 'insights' && (currentRunId ? (
           <InsightsReportView runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'analytics' && currentRunId && (
+        {activeTab === 'analytics' && (currentRunId ? (
           <AdvancedAnalytics runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
-        {activeTab === 'audit' && currentRunId && (
+        {activeTab === 'audit' && (currentRunId ? (
           <AuditLogPage runId={currentRunId} />
-        )}
+        ) : renderRunRequiredFallback())}
 
         {activeTab === 'settings' && (
           <SettingsPage />
         )}
       </main>
+
 
       <ToastContainer toasts={toasts} onDismiss={id => setToasts(t => t.filter(x => x.id !== id))} />
 

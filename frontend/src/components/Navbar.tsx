@@ -26,10 +26,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 sm:gap-2">
+          <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none py-1">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                 activeTab === 'dashboard'
                   ? 'bg-slate-800 text-blue-400 border border-slate-700'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
             <button
               onClick={() => setActiveTab('new-run')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                 activeTab === 'new-run'
                   ? 'bg-slate-800 text-blue-400 border border-slate-700'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
               <>
                 <button
                   onClick={() => setActiveTab('run-results')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                     activeTab === 'run-results'
                       ? 'bg-slate-800 text-blue-400 border border-slate-700'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
                 <button
                   onClick={() => setActiveTab('exceptions')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                     activeTab === 'exceptions'
                       ? 'bg-slate-800 text-amber-400 border border-slate-700'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
                 <button
                   onClick={() => setActiveTab('3way')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
                     activeTab === '3way'
                       ? 'bg-slate-800 text-blue-400 border border-slate-700 shadow-md'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
                 <button
                   onClick={() => setActiveTab('insights')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
                     activeTab === 'insights'
                       ? 'bg-slate-800 text-emerald-400 border border-slate-700 shadow-md'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -103,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
                 <button
                   onClick={() => setActiveTab('cash-position')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
                     activeTab === 'cash-position'
                       ? 'bg-slate-800 text-emerald-400 border border-slate-700 shadow-md'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -115,7 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
 
                 <button
                   onClick={() => setActiveTab('analytics')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
                     activeTab === 'analytics'
                       ? 'bg-slate-800 text-indigo-400 border border-slate-700'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -123,18 +123,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, current
                 >
                   <TrendingUp className="w-4 h-4" />
                   <span>Intelligence</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('audit')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'audit'
-                      ? 'bg-slate-800 text-purple-400 border border-slate-700'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                  }`}
-                >
-                  <History className="w-4 h-4" />
-                  <span>Audit Trail</span>
                 </button>
               </>
             )}

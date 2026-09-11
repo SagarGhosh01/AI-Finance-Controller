@@ -3,7 +3,7 @@ Predictive Cash Flow & Liquidity Forecasting Engine for Fincheck AI.
 Generates 30-day daily cash projections, working capital velocity, and exception impact models.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any
 
 class LiquidityForecaster:
@@ -28,7 +28,7 @@ class LiquidityForecaster:
         avg_daily_outflow = total_outflow / 30.0 if total_outflow > 0 else 320.0
         net_daily_velocity = avg_daily_inflow - avg_daily_outflow
 
-        base_date = datetime.utcnow()
+        base_date = datetime.now(timezone.utc)
         timeline = []
 
         running_conservative = current_balance

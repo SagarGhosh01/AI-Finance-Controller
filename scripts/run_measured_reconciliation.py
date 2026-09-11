@@ -7,7 +7,7 @@ import sys
 import os
 import asyncio
 import csv
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Add backend directory to sys.path
 sys.path.insert(0, os.path.abspath("backend"))
@@ -41,7 +41,7 @@ async def main():
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    run_id = f"run-benchmark-{int(datetime.utcnow().timestamp())}"
+    run_id = f"run-benchmark-{int(datetime.now(timezone.utc).timestamp())}"
 
     # 3. Execute Pipeline
     orchestrator = ReconciliationOrchestrator(session)

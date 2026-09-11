@@ -7,7 +7,7 @@ and custom CSV exports into standardized transaction objects.
 import io
 import csv
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Tuple
 
 def parse_amount(val: Any) -> float:
@@ -25,7 +25,7 @@ def parse_amount(val: Any) -> float:
 
 def normalize_date(date_str: Any) -> str:
     if not date_str:
-        return datetime.utcnow().strftime("%Y-%m-%d")
+        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
     s = str(date_str).strip()
 
     # Try common financial date formats
@@ -94,7 +94,7 @@ class RealDataParser:
             rec_id = str(r.get(rec_id_col)) if rec_id_col and r.get(rec_id_col) else f"{'LED' if source_label == 'A' else 'BNK'}-REAL-{row_num}"
             ref_id = str(r.get(ref_id_col)) if ref_id_col and r.get(ref_id_col) else rec_id
 
-            txn_date = normalize_date(r.get(date_col)) if date_col else datetime.utcnow().strftime("%Y-%m-%d")
+            txn_date = normalize_date(r.get(date_col)) if date_col else datetime.now(timezone.utc).strftime("%Y-%m-%d")
             counterparty = str(r.get(cp_col, "Real Financial Transaction"))
 
             normalized_records.append({

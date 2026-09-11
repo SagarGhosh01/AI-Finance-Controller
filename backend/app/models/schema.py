@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, Integer, DateTime, Text, JSON, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from app.core.db import Base
@@ -8,7 +8,7 @@ class Run(Base):
     __tablename__ = "runs"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     status = Column(String, default="pending")  # pending, running, completed, failed
     source_a_name = Column(String, default="Internal Ledger")
     source_b_name = Column(String, default="Bank Feed")
@@ -55,7 +55,7 @@ class Match(Base):
     match_tier = Column(String, nullable=False)  # exact, tolerant, llm, split
     confidence = Column(Float, default=1.0)
     reasoning = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     run = relationship("Run", back_populates="matches")
 
@@ -89,6 +89,6 @@ class AuditLog(Base):
     action = Column(String, nullable=False)
     target_record_id = Column(String, nullable=True)
     details = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     run = relationship("Run", back_populates="audit_logs")

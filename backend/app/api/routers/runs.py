@@ -2,7 +2,7 @@ import csv
 import io
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Response
 from fastapi.responses import StreamingResponse
@@ -137,7 +137,7 @@ def resolve_exception(
 
     ex.resolution_status = body.action
     ex.resolved_by = "human_analyst"
-    ex.resolved_at = datetime.utcnow()
+    ex.resolved_at = datetime.now(timezone.utc)
 
     cand_id = body.target_candidate_id or ex.candidate_record_id
     rec = db.query(Record).filter(Record.id == ex.record_id).first()
@@ -286,7 +286,7 @@ def approve_close(run_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Run not found")
 
     run.approved_by = "controller_lead"
-    run.approved_at = datetime.utcnow()
+    run.approved_at = datetime.now(timezone.utc)
 
     db.add(AuditLog(
         run_id=run_id,
@@ -407,7 +407,7 @@ def ai_auto_resolve_exceptions(run_id: str, db: Session = Depends(get_db)):
                 cand_rec.status = "matched"
                 ex.resolution_status = "accept"
                 ex.resolved_by = "ai_auto_resolver"
-                ex.resolved_at = datetime.utcnow()
+                ex.resolved_at = datetime.now(timezone.utc)
 
                 match_obj = Match(
                     run_id=run_id,
